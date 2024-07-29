@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869672125970",
+    "project_id": "madusanka-47021",
+    "storage_bucket": "madusanka-47021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869672125970:android:7b38441a42851557043acb",
+        "android_client_info": {
+          "package_name": "com.example.signup_07_19"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPV0tatVSxAG7MwRpflDrcTuorPGhKt-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
