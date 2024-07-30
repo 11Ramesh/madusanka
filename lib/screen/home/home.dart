@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/screen/home/sell/sell.dart';
-import 'package:signup_07_19/screen/home/a/a.dart';
+import 'package:signup_07_19/screen/home/allview/allview.dart';
 import 'package:signup_07_19/screen/home/spent/spent.dart';
 import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/homePageAppBar.dart';

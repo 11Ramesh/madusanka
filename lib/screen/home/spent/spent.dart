@@ -29,6 +29,18 @@ class _SpentState extends State<Spent> {
   List spentAllData = [];
   int _totalSpent = 0;
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an email';
+    }
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (!numericRegex.hasMatch(value)) {
+      return 'Please enter a Numeric Value';
+    }
+
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -141,6 +153,7 @@ class _SpentState extends State<Spent> {
                         child: TextInPutField(
                             text: 'Enter Here',
                             controller: _typeSpent,
+                            validator: _validateEmail,
                             radius: 10),
                       ),
                     ],
@@ -157,6 +170,8 @@ class _SpentState extends State<Spent> {
                         child: TextInPutField(
                             text: 'Enter Here',
                             controller: _PriceSpent,
+                            keyboardType: TextInputType.number,
+                            validator: _validateEmail,
                             radius: 10),
                       ),
                     ],

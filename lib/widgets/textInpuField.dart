@@ -14,6 +14,7 @@ class TextInPutField extends StatelessWidget {
     this.iSprefix,
     this.validator,
     this.onChanged,
+    this.keyboardType = TextInputType.text,
     super.key,
   });
 
@@ -28,6 +29,7 @@ class TextInPutField extends StatelessWidget {
   String? family = 'Montserrat';
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  TextInputType keyboardType;
 
   bool? iSprefix = true;
   @override
@@ -36,6 +38,7 @@ class TextInPutField extends StatelessWidget {
       controller: controller,
       validator: validator,
       onChanged: onChanged,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.all(15),
         prefixIcon: Icon(icon),

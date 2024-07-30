@@ -182,6 +182,7 @@ class _SalesAddState extends State<SalesAdd> {
                         child: TextInPutField(
                             text: 'Enter Here',
                             controller: _unitPrice,
+                            keyboardType: TextInputType.number,
                             radius: 10),
                       ),
                     ],
@@ -196,6 +197,7 @@ class _SalesAddState extends State<SalesAdd> {
                       Expanded(
                         child: TextInPutField(
                             text: 'Enter Here',
+                            keyboardType: TextInputType.number,
                             controller: _initialQuantity,
                             radius: 10),
                       ),
@@ -212,6 +214,7 @@ class _SalesAddState extends State<SalesAdd> {
                         child: TextInPutField(
                             text: 'Enter Here',
                             controller: _sellQuantity,
+                            keyboardType: TextInputType.number,
                             radius: 10),
                       ),
                     ],
