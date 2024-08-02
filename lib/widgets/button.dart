@@ -9,6 +9,8 @@ class Button extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
     required this.radius,
+    this.width,
+    this.height,
     super.key,
   });
 
@@ -19,20 +21,27 @@ class Button extends StatelessWidget {
   Color? backgroundColor = Colors.white;
   Color? foregroundColor = Colors.black;
   double radius = 50;
+  double? width;
+  double? height;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onclick,
-      child: Text(
-        text,
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-              radius), // Optional: Change the border radius
+    return Container(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: onclick,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: fontSize),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+                radius), // Optional: Change the border radius
+          ),
         ),
       ),
     );

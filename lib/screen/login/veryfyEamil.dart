@@ -3,14 +3,18 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/home/home.dart';
 import 'package:signup_07_19/screen/login/forgetPassword.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/message.dart';
+import 'package:signup_07_19/widgets/textShow.dart';
 
 class VerifyEmail extends StatefulWidget {
   const VerifyEmail({super.key});
@@ -26,7 +30,6 @@ class _VerifyEmailState extends State<VerifyEmail> {
   String email = '';
   String password = '';
   bool isreg = false;
-  
 
   void initState() {
     checkEmailVerification();
@@ -121,9 +124,17 @@ class _VerifyEmailState extends State<VerifyEmail> {
             body: Center(
               child: Column(
                 children: [
-                  const Text('Verification using email'),
+                  Lottie.asset('assets/loties/verification.json'),
+                  TextShow(
+                    text: 'Don\'t click back',
+                    fontSize: 20,
+                  ),
+                  TextShow(text: 'Verify email to continue', fontSize: 20),
+                  Heights(height: 0.02),
                   Button(
                       text: 'resend',
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                       radius: 10,
                       onclick: () {
                         reSendEmailUser(email, password);

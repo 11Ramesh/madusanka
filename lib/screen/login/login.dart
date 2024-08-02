@@ -1,18 +1,24 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/constant.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/home/home.dart';
 import 'package:signup_07_19/screen/login/signup.dart';
 import 'package:signup_07_19/screen/login/veryfyEamil.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/indicator.dart';
 import 'package:signup_07_19/widgets/message.dart';
+import 'package:signup_07_19/widgets/textButton.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
 
@@ -36,6 +42,7 @@ class _LoginState extends State<Login> {
   bool ismessageSend = false;
   bool isMoveHome = false;
   bool isUserHasAccount = false;
+  bool isPasswordShow = false;
 
   @override
   void initState() {
@@ -251,58 +258,107 @@ class _LoginState extends State<Login> {
             appBar: AppBar(
               automaticallyImplyLeading: false,
             ),
-            body: Center(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextShow(text: 'Login'),
-                    TextInPutField(
-                      text: 'Email',
-                      controller: _emailController,
-                      radius: 10,
-                      validator: _validateEmail,
-                    ),
-                    TextInPutField(
+            body: Padding(
+              padding: EdgeInsets.only(
+                  left: ScreenUtil.screenWidth * 0.1,
+                  right: ScreenUtil.screenWidth * 0.1),
+              child: Center(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // Container(
+                      //     height: ScreenUtil.screenHeight * 0.3,
+                      //     child: Lottie.asset('assets/loties/login.json')),
+
+                      TextShow(
+                        text: 'Login',
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                      //size box for 10% of screen height
+                      Heights(height: 0.1),
+
+                      TextInPutField(
+                        text: 'Email',
+                        controller: _emailController,
+                        radius: 10,
+                        validator: _validateEmail,
+                        prefixIcon: Icons.person,
+                      ),
+
+                      //size box for 10% of screen height
+                      Heights(height: 0.02),
+                      TextInPutField(
                         text: 'Password',
                         controller: _passWordController,
-                        radius: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Button(
-                          text: 'Login',
-                          radius: 10,
-                          onclick: () {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              // for  circular indicator
-                              homeMovement(true);
+                        radius: 10,
+                        prefixIcon: Icons.lock,
+                        sufixIcon: isPasswordShow
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        sufixOnPress: () {
+                          setState(() {
+                            isPasswordShow = !isPasswordShow;
+                          });
+                        },
+                        obscureText: isPasswordShow,
+                      ),
 
-                              checkUsernameAndPassword();
-                            }
-                          },
-                        ),
-                        Button(
-                          text: 'Sign Up',
-                          radius: 10,
-                          onclick: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignUp()));
-                          },
-                        ),
-                        Button(
-                          text: 'Forget Password',
-                          radius: 10,
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextsButton(
+                          text: 'Forget Password ?',
                           onclick: () {
                             showAlertDialogBox(context);
                           },
+                          foregroundColor: Colors.blue,
                         ),
-                      ],
-                    )
-                  ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Button(
+                            width: ScreenUtil.screenWidth,
+                            height: ScreenUtil.screenWidth * 0.12,
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            fontSize: 20,
+                            text: 'Login',
+                            radius: 30,
+                            onclick: () {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                // for  circular indicator
+                                homeMovement(true);
+
+                                checkUsernameAndPassword();
+                              }
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextShow(
+                                text: 'Don\'t have an account?',
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                              TextsButton(
+                                  text: 'Sign Up',
+                                  onclick: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SignUp()));
+                                  })
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

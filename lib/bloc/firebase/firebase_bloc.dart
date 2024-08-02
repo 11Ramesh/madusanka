@@ -105,6 +105,7 @@ class FirebaseBloc extends Bloc<FirebaseEvent, FirebaseState> {
         //
         String ownerId = event.ownerId;
         String formattedDate = event.formattedDate;
+
         List<String> productIds = [];
         List productAllData = [];
         num allTotal = 0;
@@ -170,17 +171,18 @@ class FirebaseBloc extends Bloc<FirebaseEvent, FirebaseState> {
 
           profit = allTotal - _totalSpent;
         } catch (e) {
-          print(e);
+          print('error occur :${e}');
+         
         }
+
         emit(HomePageState(
-          productAllData: productAllData,
-          productIds: productIds,
-          allTotal: allTotal,
-          spentAllData: spentAllData,
-          spentIds: spentIds,
-          totalSpent: _totalSpent,
-          profit :profit
-        ));
+            productAllData: productAllData,
+            productIds: productIds,
+            allTotal: allTotal,
+            spentAllData: spentAllData,
+            spentIds: spentIds,
+            totalSpent: _totalSpent,
+            profit: profit));
       }
     });
   }

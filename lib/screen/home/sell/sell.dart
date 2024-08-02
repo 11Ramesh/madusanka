@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
+import 'package:signup_07_19/widgets/addButton.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
+import 'package:signup_07_19/widgets/noDataLoad.dart';
+import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textButton.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
+import 'package:signup_07_19/widgets/totalSowBox.dart';
 
 class SalesAdd extends StatefulWidget {
   const SalesAdd({super.key});
@@ -22,7 +26,6 @@ class _SalesAddState extends State<SalesAdd> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _type = TextEditingController();
   final TextEditingController _unitPrice = TextEditingController();
-
   final TextEditingController _initialQuantity = TextEditingController();
   final TextEditingController _sellQuantity = TextEditingController();
 
@@ -30,13 +33,19 @@ class _SalesAddState extends State<SalesAdd> {
   late FirebaseBloc firebaseBloc;
   String ownerId = "";
 
-  String formattedDate =
-      "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+  String formattedDate = DateTime.now().toString().split(' ')[0];
   List productAllData = [];
   List<String> productIds = [];
-
   int _oneTypeTotalPrice = 0;
   int _allTotal = 0;
+
+  final List<String> headers = [
+    'Type',
+    'Unit \nPrice',
+    'Initial \nQuantity',
+    'Sell \nQuantity',
+    'Total \nPrice',
+  ];
 
   @override
   void initState() {
@@ -51,8 +60,17 @@ class _SalesAddState extends State<SalesAdd> {
     print(ownerId);
   }
 
-  void dipose() {
+  @override
+  void dispose() {
     clearAllController();
+    super.dispose();
+  }
+
+  clearAllController() {
+    _type.clear();
+    _unitPrice.clear();
+    _initialQuantity.clear();
+    _sellQuantity.clear();
   }
 
   saveDataFirebase() async {
@@ -99,13 +117,6 @@ class _SalesAddState extends State<SalesAdd> {
     } catch (e) {
       print(e);
     }
-  }
-
-  clearAllController() {
-    _type.clear();
-    _unitPrice.clear();
-    _initialQuantity.clear();
-    _sellQuantity.clear();
   }
 
   void beforeDeleteShowAlertDialogBox(
@@ -157,65 +168,59 @@ class _SalesAddState extends State<SalesAdd> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  /// product type
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextShow(
-                        text: 'Product Type',
-                      ),
+                      TextShow(text: 'Product Type'),
                       Expanded(
                         child: TextInPutField(
-                            text: 'Enter Here', controller: _type, radius: 10),
+                          text: 'Enter Here',
+                          controller: _type,
+                          validator: _validateSellType,
+                          radius: 10,
+                        ),
                       ),
                     ],
                   ),
-
-                  /// product type unit price
-
                   Row(
                     children: [
-                      TextShow(
-                        text: 'Unit Price',
-                      ),
+                      TextShow(text: 'Unit Price'),
                       Expanded(
                         child: TextInPutField(
-                            text: 'Enter Here',
-                            controller: _unitPrice,
-                            keyboardType: TextInputType.number,
-                            radius: 10),
+                          text: 'Enter Here',
+                          controller: _unitPrice,
+                          keyboardType: TextInputType.number,
+                          validator: _validateSellUnitPrice,
+                          radius: 10,
+                        ),
                       ),
                     ],
                   ),
-
-                  ///Initial  quantity of the stock
                   Row(
                     children: [
-                      TextShow(
-                        text: 'Initial Quantity',
-                      ),
+                      TextShow(text: 'Initial Quantity'),
                       Expanded(
                         child: TextInPutField(
-                            text: 'Enter Here',
-                            keyboardType: TextInputType.number,
-                            controller: _initialQuantity,
-                            radius: 10),
+                          text: 'Enter Here',
+                          keyboardType: TextInputType.number,
+                          controller: _initialQuantity,
+                          validator: _validateSellInitialQuantity,
+                          radius: 10,
+                        ),
                       ),
                     ],
                   ),
-
-                  /// sell quantity of the stock
                   Row(
                     children: [
-                      TextShow(
-                        text: 'Sell Quantity',
-                      ),
+                      TextShow(text: 'Sell Quantity'),
                       Expanded(
                         child: TextInPutField(
-                            text: 'Enter Here',
-                            controller: _sellQuantity,
-                            keyboardType: TextInputType.number,
-                            radius: 10),
+                          text: 'Enter Here',
+                          controller: _sellQuantity,
+                          keyboardType: TextInputType.number,
+                          validator: _validateSellQuantity,
+                          radius: 10,
+                        ),
                       ),
                     ],
                   ),
@@ -242,7 +247,7 @@ class _SalesAddState extends State<SalesAdd> {
                   Navigator.of(context).pop();
                 }
               },
-            )
+            ),
           ],
         );
       },
@@ -252,102 +257,272 @@ class _SalesAddState extends State<SalesAdd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            TextShow(text: formattedDate),
-            Button(
-              text: 'ADD',
-              radius: 20,
-              onclick: () {
-                clearAllController();
-                addSellsNotification(context, true, 'id');
-              },
-            ),
-            BlocBuilder<FirebaseBloc, FirebaseState>(
-              builder: (context, state) {
-                if (state is ProductAddState) {
-                  productAllData = state.productAllData;
-                  productIds = state.productIds;
-                  _allTotal = int.parse(state.allTotal.toString());
+      body: Padding(
+        padding:
+            EdgeInsets.symmetric(horizontal: ScreenUtil.screenWidth * 0.02),
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          // physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextShow(
+                    text: 'Today',
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AddButton(
+                    text: 'ADD',
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    radius: 100,
+                    onClick: () {
+                      clearAllController();
+                      addSellsNotification(context, true, 'id');
+                    },
+                  ),
+                ],
+              ),
+              Heights(height: 0.02),
+              BlocBuilder<FirebaseBloc, FirebaseState>(
+                builder: (context, state) {
+                  if (state is ProductAddState) {
+                    productAllData = state.productAllData;
+                    productIds = state.productIds;
+                    _allTotal = int.parse(state.allTotal.toString());
 
+                    return _allTotal == 0
+                        ? Column(
+                            children: [
+                              Heights(height: 0.15),
+                              NoDataLoad(),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              //height size box
+                              Heights(height: 0.02),
+
+                              TotalShowBox(
+                                text: "Total Spent : \nRs.$_allTotal",
+                              ),
+
+                              //height size box
+                              Heights(height: 0.02),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue[200],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListView(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: headers.map((header) {
+                                          return Expanded(
+                                            child: TextShow(
+                                              text: header,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: productAllData.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom:
+                                              BorderSide(color: Colors.grey)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: TextShow(
+                                                text:
+                                                    '${productAllData[index]['type']}',
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: TextShow(
+                                                text:
+                                                    'Rs.${productAllData[index]['unitPrice']}',
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: TextShow(
+                                                text:
+                                                    '${productAllData[index]['initialQuantity']}',
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: TextShow(
+                                                text:
+                                                    '${productAllData[index]['sellQuantity']}',
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: TextShow(
+                                                text:
+                                                    '${productAllData[index]['totalPrice']}',
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Column(
+                                                children: [
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      Icons.edit,
+                                                      size: 20,
+                                                    ),
+                                                    onPressed: () {
+                                                      _type.text =
+                                                          productAllData[index]
+                                                              ['type'];
+                                                      _unitPrice.text =
+                                                          productAllData[index]
+                                                                  ['unitPrice']
+                                                              .toString();
+                                                      _sellQuantity.text =
+                                                          productAllData[index][
+                                                                  'sellQuantity']
+                                                              .toString();
+                                                      _initialQuantity
+                                                          .text = productAllData[
+                                                                  index][
+                                                              'initialQuantity']
+                                                          .toString();
+
+                                                      addSellsNotification(
+                                                          context,
+                                                          false,
+                                                          productIds[index]);
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      Icons.delete,
+                                                      size: 20,
+                                                    ),
+                                                    onPressed: () {
+                                                      beforeDeleteShowAlertDialogBox(
+                                                          context,
+                                                          productAllData[index]
+                                                              ['type'],
+                                                          productIds[index]);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                  }
                   return Column(
                     children: [
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // Number of columns
-                          crossAxisSpacing: 10.0, // Spacing between columns
-                          mainAxisSpacing: 10.0, // Spacing between rows
-                        ),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            color: Colors.blue,
-                            child: Container(
-                                child: Column(
-                              children: [
-                                TextShow(
-                                    text:
-                                        'Type : ${productAllData[index]['type']}'),
-                                TextShow(
-                                    text:
-                                        'totalPrice : ${productAllData[index]['totalPrice']}'),
-                                Row(
-                                  children: [
-                                    TextsButton(
-                                        text: 'Edit',
-                                        onclick: () {
-                                          _type.text =
-                                              productAllData[index]['type'];
-                                          _unitPrice.text =
-                                              productAllData[index]['unitPrice']
-                                                  .toString();
-                                          _sellQuantity.text =
-                                              productAllData[index]
-                                                      ['sellQuantity']
-                                                  .toString();
-                                          _initialQuantity.text =
-                                              productAllData[index]
-                                                      ['initialQuantity']
-                                                  .toString();
-
-                                          addSellsNotification(context, false,
-                                              productIds[index]);
-                                        }),
-                                    TextsButton(
-                                        text: 'Delete',
-                                        onclick: () {
-                                          beforeDeleteShowAlertDialogBox(
-                                              context,
-                                              productAllData[index]['type'],
-                                              productIds[index]);
-                                        })
-                                  ],
-                                )
-                              ],
-                            )),
-                          );
-                        },
-                        itemCount: productAllData
-                            .length, // Number of items in the grid
-                      ),
-                      TextShow(text: 'Total sell Item price : ${_allTotal}')
+                      Heights(height: 0.2),
+                      ProcessBars(),
                     ],
                   );
-                }
-                return Container(
-                  child: const Center(
-                    child: Text('No Data'),
-                  ),
-                );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // Validators moved out of build to avoid rebuilding the methods
+  String? _validateSellType(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a product type';
+    }
+    return null;
+  }
+
+  String? _validateSellUnitPrice(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Unit price can\'t be empty';
+    }
+    if (value == "0") {
+      return 'Unit price can\'t be zero';
+    }
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (!numericRegex.hasMatch(value)) {
+      return 'Please enter a numeric value';
+    }
+    return null;
+  }
+
+  String? _validateSellInitialQuantity(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Initial quantity can\'t be empty';
+    }
+    if (value == "0") {
+      return 'Initial quantity can\'t be zero';
+    }
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (!numericRegex.hasMatch(value)) {
+      return 'Please enter a numeric value';
+    }
+    return null;
+  }
+
+  String? _validateSellQuantity(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Sell quantity can\'t be empty';
+    }
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (!numericRegex.hasMatch(value)) {
+      return 'Please enter a numeric value';
+    }
+    if (int.parse(_initialQuantity.text) < int.parse(_sellQuantity.text)) {
+      return 'Sell quantity can\'t be greater than initial quantity';
+    }
+    return null;
   }
 }

@@ -4,9 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
+import 'package:signup_07_19/widgets/addButton.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
+import 'package:signup_07_19/widgets/noDataLoad.dart';
+import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
+import 'package:signup_07_19/widgets/totalSowBox.dart';
 
 class Spent extends StatefulWidget {
   const Spent({super.key});
@@ -16,8 +22,7 @@ class Spent extends StatefulWidget {
 }
 
 class _SpentState extends State<Spent> {
-  String formattedDate =
-      "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+  String formattedDate = DateTime.now().toString().split(' ')[0];
 
   late SharedPreferences sharedPreferences;
   late FirebaseBloc firebaseBloc;
@@ -29,7 +34,24 @@ class _SpentState extends State<Spent> {
   List spentAllData = [];
   int _totalSpent = 0;
 
-  String? _validateEmail(String? value) {
+  final List<String> headers = [
+    'Type',
+    ' ',
+    'Unit Price',
+  ];
+
+  // validate item type
+  String? _validateSpentType(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an email';
+    }
+
+    return null;
+  }
+
+  //validate item price
+
+  String? _validateSpentPrice(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter an email';
     }
@@ -51,7 +73,6 @@ class _SpentState extends State<Spent> {
     firebaseBloc = BlocProvider.of<FirebaseBloc>(context);
     sharedPreferences = await SharedPreferences.getInstance();
     ownerId = sharedPreferences.getString('ownerId').toString();
-    print(ownerId);
   }
 
   saveDataFirebase() async {
@@ -153,7 +174,7 @@ class _SpentState extends State<Spent> {
                         child: TextInPutField(
                             text: 'Enter Here',
                             controller: _typeSpent,
-                            validator: _validateEmail,
+                            validator: _validateSpentType,
                             radius: 10),
                       ),
                     ],
@@ -171,7 +192,7 @@ class _SpentState extends State<Spent> {
                             text: 'Enter Here',
                             controller: _PriceSpent,
                             keyboardType: TextInputType.number,
-                            validator: _validateEmail,
+                            validator: _validateSpentPrice,
                             radius: 10),
                       ),
                     ],
@@ -208,67 +229,143 @@ class _SpentState extends State<Spent> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          TextShow(text: formattedDate),
-          Button(
-            text: 'Add',
-            radius: 20,
-            onclick: () {
-              clearAllController();
-              addSpentNotification(context, 'id', true);
-            },
-          ),
-          BlocBuilder<FirebaseBloc, FirebaseState>(
-            builder: (context, state) {
-              if (state is SpentAddState) {
-                spentIds = state.spentIds;
-                spentAllData = state.spentAllData;
-                _totalSpent = int.parse(state.totalSpent.toString());
+    return Padding(
+      padding: EdgeInsets.only(
+          left: ScreenUtil.screenWidth * 0.02,
+          right: ScreenUtil.screenWidth * 0.02),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextShow(
+                  text: 'Today',
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+                AddButton(
+                  text: 'ADD',
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                  radius: 100,
+                  onClick: () {
+                    clearAllController();
+                    addSpentNotification(context, 'id', true);
+                  },
+                ),
+              ],
+            ),
+            BlocBuilder<FirebaseBloc, FirebaseState>(
+              builder: (context, state) {
+                if (state is SpentAddState) {
+                  spentIds = state.spentIds;
+                  spentAllData = state.spentAllData;
+                  _totalSpent = int.parse(state.totalSpent.toString());
+                  return _totalSpent == 0
+                      ? Column(
+                          children: [
+                            Heights(height: 0.15),
+                            NoDataLoad(),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            //height size box
+                            Heights(height: 0.04),
+
+                            TotalShowBox(
+                              text: "Total Spent : \nRs.$_totalSpent",
+                            ),
+
+                            //height size box
+                            Heights(height: 0.02),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.blue[200],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListView(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: headers.map((header) {
+                                        return Expanded(
+                                          child: TextShow(
+                                            text: header,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: spentIds.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  title: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextShow(
+                                          text: spentAllData[index]
+                                              ['spentType'],
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      TextShow(
+                                          text: spentAllData[index]
+                                                  ['spentPrice']
+                                              .toString()),
+                                    ],
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.edit_document),
+                                    onPressed: () {
+                                      _PriceSpent.text = spentAllData[index]
+                                              ['spentPrice']
+                                          .toString();
+                                      _typeSpent.text =
+                                          spentAllData[index]['spentType'];
+
+                                      addSpentNotification(
+                                          context, spentIds[index], false);
+                                    },
+                                  ),
+                                  onLongPress: () {
+                                    beforeDeleteShowAlertDialogBox(
+                                        context,
+                                        spentIds[index],
+                                        spentAllData[index]['spentType']);
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                }
                 return Column(
                   children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: spentIds.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: TextShow(
-                            text: spentAllData[index]['spentType'],
-                            fontSize: 18,
-                          ),
-                          subtitle: TextShow(
-                              text:
-                                  spentAllData[index]['spentPrice'].toString()),
-                          trailing: IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              _PriceSpent.text =
-                                  spentAllData[index]['spentPrice'].toString();
-                              _typeSpent.text =
-                                  spentAllData[index]['spentType'];
-
-                              addSpentNotification(
-                                  context, spentIds[index], false);
-                            },
-                          ),
-                          onLongPress: () {
-                            beforeDeleteShowAlertDialogBox(
-                                context,
-                                spentIds[index],
-                                spentAllData[index]['spentType']);
-                          },
-                        );
-                      },
-                    ),
-                    TextShow(text: 'Today total Spent : ${_totalSpent}'),
+                    Heights(height: 0.2),
+                    ProcessBars(),
                   ],
                 );
-              }
-              return TextShow(text: 'No Data');
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

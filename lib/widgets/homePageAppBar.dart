@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:signup_07_19/function_common/logout.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -8,7 +9,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.amber,
+      backgroundColor: Colors.white70,
       automaticallyImplyLeading: false,
       // leading:  Image.asset(
       //     'assets/images/appbarTitle.png',
@@ -24,16 +25,18 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 IconButton(
                   icon: const Icon(
                     Icons.notifications,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                   onPressed: () {},
                 ),
                 IconButton(
                   icon: const Icon(
                     Icons.settings,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    showLogoutConfirmationDialog(context);
+                  },
                 ),
               ],
             )

@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   bool connection = false;
+  String formattedDate = DateTime.now().toString().split(' ')[0];
 
   @override
   void initState() {
@@ -49,6 +50,8 @@ class _HomeState extends State<Home> {
     initConnectivity();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    firebaseBloc.add(HomePageEvent(ownerId, formattedDate));
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -107,16 +110,10 @@ class _HomeState extends State<Home> {
                 setState(() {
                   currentTab = index;
                   if (currentTab == 1) {
-                    String formattedDate =
-                        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
                     firebaseBloc.add(ProductAddEvent(ownerId, formattedDate));
                   } else if (currentTab == 2) {
-                    String formattedDate =
-                        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
                     firebaseBloc.add(SpentAddEvent(ownerId, formattedDate));
                   } else if (currentTab == 0) {
-                    String formattedDate =
-                        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
                     firebaseBloc.add(HomePageEvent(ownerId, formattedDate));
                   }
                 });

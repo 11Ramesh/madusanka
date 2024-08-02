@@ -9,8 +9,10 @@ import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/constant.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/login/veryfyEamil.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/message.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
@@ -152,38 +154,70 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextShow(text: 'Sign Up'),
-              TextInPutField(
+      body: Padding(
+        padding: EdgeInsets.only(
+            left: ScreenUtil.screenWidth * 0.1,
+            right: ScreenUtil.screenWidth * 0.1),
+        child: Center(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextShow(
+                  text: 'Sign Up',
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+                //size box for 10% of screen height
+                Heights(height: 0.05),
+
+                TextInPutField(
                   text: 'Email',
                   controller: _emailController,
                   validator: _validateEmail,
-                  radius: 10),
-              TextInPutField(
+                  radius: 10,
+                  prefixIcon: Icons.person,
+                ),
+                //size box for 10% of screen height
+                Heights(height: 0.02),
+                TextInPutField(
                   text: 'Password',
                   controller: _passWordController,
                   validator: _validatePassword,
-                  radius: 10),
-              TextInPutField(
+                  radius: 10,
+                  prefixIcon: Icons.lock,
+                  obscureText: true,
+                ),
+                //size box for 10% of screen height
+                Heights(height: 0.02),
+                TextInPutField(
                   text: 'ComForm Password',
                   controller: _comPassWordController,
                   validator: _validateComformPassword,
-                  radius: 10),
-              Button(
-                text: 'Register',
-                radius: 10,
-                onclick: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    isRegisterEmail(_emailController.text);
-                  }
-                },
-              ),
-            ],
+                  radius: 10,
+                  prefixIcon: Icons.lock,
+                  obscureText: true,
+                ),
+                //size box for 10% of screen height
+                Heights(height: 0.05),
+                Button(
+                  width: ScreenUtil.screenWidth,
+                  height: ScreenUtil.screenWidth * 0.12,
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  fontSize: 20,
+                  text: 'Register',
+                  radius: 30,
+                  onclick: () {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      isRegisterEmail(_emailController.text);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

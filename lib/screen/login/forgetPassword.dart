@@ -6,11 +6,14 @@ import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/constant.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
+import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/home/home.dart';
 import 'package:signup_07_19/widgets/button.dart';
+import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/indicator.dart';
 import 'package:signup_07_19/widgets/message.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
+import 'package:signup_07_19/widgets/textShow.dart';
 
 class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});
@@ -85,36 +88,57 @@ class _ForgetPasswordState extends State<ForgetPassword> {
             ? Indicator()
             : Scaffold(
                 appBar: AppBar(),
-                body: Center(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        TextInPutField(
-                          text: 'Password',
-                          controller: _passworld,
-                          radius: 10,
-                          validator: _validatePassword,
-                        ),
-                        TextInPutField(
-                          text: 'Conform Passworld',
-                          controller: _conformPassworld,
-                          radius: 10,
-                          validator: _validateComformPassword,
-                        ),
-                        Button(
+                body: Padding(
+                  padding: EdgeInsets.only(
+                      left: ScreenUtil.screenWidth * 0.1,
+                      right: ScreenUtil.screenWidth * 0.1),
+                  child: Center(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextShow(
                             text: 'Change Password',
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                          //size box for 10% of screen height
+                          Heights(height: 0.05),
+                          TextInPutField(
+                            text: 'Password',
+                            controller: _passworld,
                             radius: 10,
-                            onclick: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                setState(() {
-                                  isMoveHome = true;
-                                });
-                                changePassword();
-                              }
-                            })
-                      ],
+                            validator: _validatePassword,
+                            prefixIcon: Icons.lock,
+                          ),
+                          //size box for 10% of screen height
+                          Heights(height: 0.02),
+                          TextInPutField(
+                            text: 'Conform Passworld',
+                            controller: _conformPassworld,
+                            radius: 10,
+                            validator: _validateComformPassword,
+                            prefixIcon: Icons.lock,
+                          ),
+                          //size box for 10% of screen height
+                          Heights(height: 0.05),
+                          Button(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              text: 'Change Password',
+                              radius: 10,
+                              onclick: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  setState(() {
+                                    isMoveHome = true;
+                                  });
+                                  changePassword();
+                                }
+                              })
+                        ],
+                      ),
                     ),
                   ),
                 ),
