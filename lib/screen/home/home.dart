@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/screen/home/sell/sell.dart';
@@ -95,15 +96,13 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return !connection
-        ? const Scaffold(
-          resizeToAvoidBottomInset: false,
+        ? Scaffold(
             body: Center(
-                child: Text(
-              'No Internet Connection',
-              style: TextStyle(fontSize: 20),
-            )),
+              child: Lottie.asset('assets/loties/noInternet.json'),
+            ),
           )
         : Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: HomeAppBar(),
             body: screens[currentTab],
             bottomNavigationBar: BottomNavigationBar(

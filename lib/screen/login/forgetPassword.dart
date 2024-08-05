@@ -12,6 +12,7 @@ import 'package:signup_07_19/screen/home/home.dart';
 import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/indicator.dart';
+import 'package:signup_07_19/widgets/loginProcessBar.dart';
 import 'package:signup_07_19/widgets/message.dart';
 import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
@@ -104,7 +105,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           email = state.email;
         }
         return isMoveHome
-            ? ProcessBars()
+            ? LoginProcessBar()
             : Scaffold(
                 resizeToAvoidBottomInset: false,
                 appBar: AppBar(),

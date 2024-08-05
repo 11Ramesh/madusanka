@@ -13,6 +13,7 @@ import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/login/veryfyEamil.dart';
 import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/height.dart';
+import 'package:signup_07_19/widgets/loginProcessBar.dart';
 import 'package:signup_07_19/widgets/message.dart';
 import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
@@ -175,7 +176,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return isMove
-        ? ProcessBars()
+        ? LoginProcessBar()
         : Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(),
