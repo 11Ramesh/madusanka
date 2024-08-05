@@ -6,3 +6,8 @@ class MessageColors {
 
   static const Color messageColor3 = Color(0xFFE5E5E5);
 }
+
+class ShowDialogColors {
+  static const Color ButtonColor = Colors.blue;
+  static const Color ButtonTextcolor = Colors.white;
+}

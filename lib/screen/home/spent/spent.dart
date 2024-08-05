@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
+import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
 import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/widgets/addButton.dart';
@@ -157,7 +158,7 @@ class _SpentState extends State<Spent> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: TextShow(text: 'Enter your Spent Details'),
+          title: TextShow(text: 'Enter Your Spent Details'),
           content: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -168,24 +169,27 @@ class _SpentState extends State<Spent> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextShow(
-                        text: 'Spent Type',
+                        text: 'Spent Type : ',
                       ),
                       Expanded(
                         child: TextInPutField(
-                            text: 'Enter Here',
-                            controller: _typeSpent,
-                            validator: _validateSpentType,
-                            radius: 10),
+                          text: 'Enter Here',
+                          controller: _typeSpent,
+                          validator: _validateSpentType,
+                          radius: 20,
+                        ),
                       ),
                     ],
                   ),
+                  Heights(height: 0.01),
 
                   /// product type unit price
 
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextShow(
-                        text: 'How many Spent',
+                        text: 'How many Spent : ',
                       ),
                       Expanded(
                         child: TextInPutField(
@@ -193,7 +197,8 @@ class _SpentState extends State<Spent> {
                             controller: _PriceSpent,
                             keyboardType: TextInputType.number,
                             validator: _validateSpentPrice,
-                            radius: 10),
+                            radius: 20,
+                            prefixIcon: Icons.attach_money_outlined),
                       ),
                     ],
                   ),
@@ -208,6 +213,8 @@ class _SpentState extends State<Spent> {
               onclick: () {
                 Navigator.of(context).pop();
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             ),
             Button(
               text: 'Ok',
@@ -220,6 +227,8 @@ class _SpentState extends State<Spent> {
                   firebaseBloc.add(SpentAddEvent(ownerId, formattedDate));
                 }
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             )
           ],
         );

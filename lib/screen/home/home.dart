@@ -96,6 +96,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return !connection
         ? const Scaffold(
+          resizeToAvoidBottomInset: false,
             body: Center(
                 child: Text(
               'No Internet Connection',

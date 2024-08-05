@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/constant.dart';
@@ -12,6 +13,7 @@ import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/indicator.dart';
 import 'package:signup_07_19/widgets/message.dart';
+import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
 
@@ -29,6 +31,17 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   String email = '';
   String id = '';
   bool isMoveHome = false;
+  late SharedPreferences sharedPreferences;
+
+  @override
+  void initState() {
+    initializedSharedReference();
+    super.initState();
+  }
+
+  initializedSharedReference() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -56,25 +69,31 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   }
 
   changePassword() async {
-    QuerySnapshot querySnapshot = await firestore.get();
+    try {
+      QuerySnapshot querySnapshot = await firestore.get();
 
-    for (var userId in querySnapshot.docs) {
-      if (userId['email'] == email) {
-        id = userId.id;
-        break;
+      for (var userId in querySnapshot.docs) {
+        if (userId['email'] == email) {
+          id = userId.id;
+          break;
+        }
       }
-    }
 
-    await firestore.doc(id).update({'password': _passworld.text});
+      await firestore.doc(id).update({'password': _passworld.text});
+      //owner id store in shared preference
+      await sharedPreferences.setString('ownerId', id);
+      //isUserHasAccount store in shared preference
+      await sharedPreferences.setBool('isUserHasAccount', true);
 
-    const bottomMessage = BottomMessage(
-      fontSize: 18.0,
-      text: 'Change Password Successfully',
-      backgroundColor: MessageColors.messageBlue,
-    );
-    bottomMessage.showSnackBar(context);
+      const bottomMessage = BottomMessage(
+        fontSize: 18.0,
+        text: 'Change Password Successfully',
+        backgroundColor: MessageColors.messageBlue,
+      );
+      bottomMessage.showSnackBar(context);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    } catch (e) {}
   }
 
   @override
@@ -85,8 +104,9 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           email = state.email;
         }
         return isMoveHome
-            ? Indicator()
+            ? ProcessBars()
             : Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: AppBar(),
                 body: Padding(
                   padding: EdgeInsets.only(

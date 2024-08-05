@@ -18,6 +18,7 @@ import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/indicator.dart';
 import 'package:signup_07_19/widgets/message.dart';
+import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textButton.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
@@ -126,8 +127,8 @@ class _LoginState extends State<Login> {
     bool emailFound = false;
     Navigator.of(context).pop();
 
-    //move homepage function
-    homeMovement(true);
+    // //move homepage function
+    // homeMovement(true);
 
     try {
       for (var userId in querySnapshot.docs) {
@@ -138,7 +139,7 @@ class _LoginState extends State<Login> {
       }
 
       if (emailFound) {
-        sendEmailUser(_fogetEmailController.text, 'password');
+        deleteAuthenticationUser(_fogetEmailController.text, 'password');
       } else {
         //move homepage function
         homeMovement(false);
@@ -150,10 +151,39 @@ class _LoginState extends State<Login> {
         bottomMessage.showSnackBar(context);
       }
     } catch (e) {
+      //move homepage function
+      homeMovement(false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed: $e')),
       );
     }
+  }
+
+  // delete authentication user
+  Future<String> deleteAuthenticationUser(String email, String password) async {
+    try {
+      List<String> signInMethods = await firebaseAuth
+          .fetchSignInMethodsForEmail(_fogetEmailController.text);
+      print(signInMethods);
+      if (signInMethods.isNotEmpty) {
+        return 'User already exists with this email';
+      }
+    } catch (e) {
+      print('error :  ${e.toString()}');
+    }
+
+    User? currentUser = firebaseAuth.currentUser;
+    if (currentUser != null) {
+      // Re-authenticate the user
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: currentUser.email!,
+        password: password, // Use the current password of the user
+      );
+      await currentUser.reauthenticateWithCredential(credential);
+      await currentUser.delete();
+    }
+    sendEmailUser(_fogetEmailController.text, 'password');
+    return 'success';
   }
 
   // this use for send email to user type email. this is for forget password
@@ -163,6 +193,7 @@ class _LoginState extends State<Login> {
       //create user for registration
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
+
       // send email to user
       User? user = userCredential.user;
       if (user != null && !user.emailVerified) {
@@ -217,14 +248,17 @@ class _LoginState extends State<Login> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: TextShow(text: 'Please Enter your Email'),
+          title: TextShow(text: 'Please Enter Your Email'),
           content: Form(
             key: _formKey1,
             child: TextInPutField(
-                text: 'Enter your Email',
-                controller: _fogetEmailController,
-                validator: _validateEmail,
-                radius: 10),
+              text: 'Enter your Email',
+              controller: _fogetEmailController,
+              validator: _validateEmail,
+              radius: 20,
+              iSprefix: false,
+              prefixIcon: Icons.mail,
+            ),
           ),
           actions: [
             Button(
@@ -233,6 +267,8 @@ class _LoginState extends State<Login> {
               onclick: () {
                 Navigator.of(context).pop();
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             ),
             Button(
               text: 'Ok',
@@ -240,9 +276,13 @@ class _LoginState extends State<Login> {
               onclick: () {
                 if (_formKey1.currentState!.validate()) {
                   _formKey1.currentState!.save();
+                  // for  circular indicator
+                  homeMovement(true);
                   isRegisterEmail();
                 }
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             )
           ],
         );
@@ -253,8 +293,9 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return isMoveHome
-        ? Indicator()
+        ? ProcessBars()
         : Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               automaticallyImplyLeading: false,
             ),

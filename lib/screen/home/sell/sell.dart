@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
+import 'package:signup_07_19/const/colors.dart';
 import 'package:signup_07_19/const/firebaseConstr.dart';
 import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/widgets/addButton.dart';
@@ -171,55 +172,62 @@ class _SalesAddState extends State<SalesAdd> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextShow(text: 'Product Type'),
+                      TextShow(text: 'Product Type : '),
                       Expanded(
                         child: TextInPutField(
                           text: 'Enter Here',
                           controller: _type,
                           validator: _validateSellType,
-                          radius: 10,
+                          radius: 20,
                         ),
                       ),
                     ],
                   ),
+                  Heights(height: 0.01),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextShow(text: 'Unit Price'),
+                      TextShow(text: 'Unit Price : '),
                       Expanded(
                         child: TextInPutField(
                           text: 'Enter Here',
                           controller: _unitPrice,
                           keyboardType: TextInputType.number,
                           validator: _validateSellUnitPrice,
-                          radius: 10,
+                          radius: 20,
+                          prefixIcon: Icons.attach_money_outlined,
                         ),
                       ),
                     ],
                   ),
+                  Heights(height: 0.01),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextShow(text: 'Initial Quantity'),
+                      TextShow(text: 'Initial Quantity : '),
                       Expanded(
                         child: TextInPutField(
                           text: 'Enter Here',
                           keyboardType: TextInputType.number,
                           controller: _initialQuantity,
                           validator: _validateSellInitialQuantity,
-                          radius: 10,
+                          radius: 20,
                         ),
                       ),
                     ],
                   ),
+                  Heights(height: 0.01),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextShow(text: 'Sell Quantity'),
+                      TextShow(text: 'Sell Quantity : '),
                       Expanded(
                         child: TextInPutField(
                           text: 'Enter Here',
                           controller: _sellQuantity,
                           keyboardType: TextInputType.number,
                           validator: _validateSellQuantity,
-                          radius: 10,
+                          radius: 20,
                         ),
                       ),
                     ],
@@ -235,6 +243,8 @@ class _SalesAddState extends State<SalesAdd> {
               onclick: () {
                 Navigator.of(context).pop();
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             ),
             Button(
               text: 'Ok',
@@ -247,6 +257,8 @@ class _SalesAddState extends State<SalesAdd> {
                   Navigator.of(context).pop();
                 }
               },
+              backgroundColor: ShowDialogColors.ButtonColor,
+              foregroundColor: ShowDialogColors.ButtonTextcolor,
             ),
           ],
         );

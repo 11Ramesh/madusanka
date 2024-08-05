@@ -14,6 +14,7 @@ import 'package:signup_07_19/screen/login/veryfyEamil.dart';
 import 'package:signup_07_19/widgets/button.dart';
 import 'package:signup_07_19/widgets/height.dart';
 import 'package:signup_07_19/widgets/message.dart';
+import 'package:signup_07_19/widgets/processBar.dart';
 import 'package:signup_07_19/widgets/textInpuField.dart';
 import 'package:signup_07_19/widgets/textShow.dart';
 
@@ -31,12 +32,18 @@ class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
   late FirebaseBloc firebaseBloc;
   late SharedPreferences sharedPreferences;
+  bool isMove = false;
 
   @override
   void initState() {
     //bloc initialized
     firebaseBloc = BlocProvider.of<FirebaseBloc>(context);
+    initializedSharedReference();
     super.initState();
+  }
+
+  initializedSharedReference() async {
+    sharedPreferences = await SharedPreferences.getInstance();
   }
 
   // email validated
@@ -93,6 +100,7 @@ class _SignUpState extends State<SignUp> {
         }
       }
       if (emailFound) {
+        homeMovement(false);
         const bottomMessage = BottomMessage(
           fontSize: 18.0,
           text: 'Already use this email before',
@@ -115,6 +123,10 @@ class _SignUpState extends State<SignUp> {
   // send message to user
   Future<String> sendEmailUser(String email, String password) async {
     try {
+      User? currentUser = firebaseAuth.currentUser;
+      if (currentUser != null) {
+        await currentUser.delete();
+      }
       //create user for registration
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -133,13 +145,17 @@ class _SignUpState extends State<SignUp> {
         firebaseBloc.add(EmailPassSendEvent(
             _emailController.text, _passWordController.text, true));
 
+        homeMovement(false);
+
         // navigation verification page
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => VerifyEmail()));
 
         return 'Verification email sent';
       }
+      homeMovement(false);
     } on FirebaseAuthException catch (e) {
+      homeMovement(false);
       final bottomMessage = BottomMessage(
         fontSize: 18.0,
         text: 'Registation is Failed: ${e.message}',
@@ -150,77 +166,87 @@ class _SignUpState extends State<SignUp> {
     return 'Registation is Successfully';
   }
 
+  homeMovement(bool move) {
+    setState(() {
+      isMove = move;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: EdgeInsets.only(
-            left: ScreenUtil.screenWidth * 0.1,
-            right: ScreenUtil.screenWidth * 0.1),
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextShow(
-                  text: 'Sign Up',
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-                //size box for 10% of screen height
-                Heights(height: 0.05),
+    return isMove
+        ? ProcessBars()
+        : Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(),
+            body: Padding(
+              padding: EdgeInsets.only(
+                  left: ScreenUtil.screenWidth * 0.1,
+                  right: ScreenUtil.screenWidth * 0.1),
+              child: Center(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextShow(
+                        text: 'Sign Up',
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                      //size box for 10% of screen height
+                      Heights(height: 0.05),
 
-                TextInPutField(
-                  text: 'Email',
-                  controller: _emailController,
-                  validator: _validateEmail,
-                  radius: 10,
-                  prefixIcon: Icons.person,
+                      TextInPutField(
+                        text: 'Email',
+                        controller: _emailController,
+                        validator: _validateEmail,
+                        radius: 10,
+                        prefixIcon: Icons.person,
+                      ),
+                      //size box for 10% of screen height
+                      Heights(height: 0.02),
+                      TextInPutField(
+                        text: 'Password',
+                        controller: _passWordController,
+                        validator: _validatePassword,
+                        radius: 10,
+                        prefixIcon: Icons.lock,
+                        obscureText: true,
+                      ),
+                      //size box for 10% of screen height
+                      Heights(height: 0.02),
+                      TextInPutField(
+                        text: 'ComForm Password',
+                        controller: _comPassWordController,
+                        validator: _validateComformPassword,
+                        radius: 10,
+                        prefixIcon: Icons.lock,
+                        obscureText: true,
+                      ),
+                      //size box for 10% of screen height
+                      Heights(height: 0.05),
+                      Button(
+                        width: ScreenUtil.screenWidth,
+                        height: ScreenUtil.screenWidth * 0.12,
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        fontSize: 20,
+                        text: 'Register',
+                        radius: 30,
+                        onclick: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            isRegisterEmail(_emailController.text);
+                            homeMovement(true);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                //size box for 10% of screen height
-                Heights(height: 0.02),
-                TextInPutField(
-                  text: 'Password',
-                  controller: _passWordController,
-                  validator: _validatePassword,
-                  radius: 10,
-                  prefixIcon: Icons.lock,
-                  obscureText: true,
-                ),
-                //size box for 10% of screen height
-                Heights(height: 0.02),
-                TextInPutField(
-                  text: 'ComForm Password',
-                  controller: _comPassWordController,
-                  validator: _validateComformPassword,
-                  radius: 10,
-                  prefixIcon: Icons.lock,
-                  obscureText: true,
-                ),
-                //size box for 10% of screen height
-                Heights(height: 0.05),
-                Button(
-                  width: ScreenUtil.screenWidth,
-                  height: ScreenUtil.screenWidth * 0.12,
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  fontSize: 20,
-                  text: 'Register',
-                  radius: 30,
-                  onclick: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      isRegisterEmail(_emailController.text);
-                    }
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

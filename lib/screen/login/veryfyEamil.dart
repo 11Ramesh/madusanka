@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,17 +44,22 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   // delete user authentication from the firebase authentication when user move to another page
   deleteAuthentication() async {
-    timer?.cancel();
+    try {
+      timer?.cancel();
 
-    User? user = firebaseAuth.currentUser;
+      User? user = firebaseAuth.currentUser;
 
-    if (user != null) {
-      await user.delete();
+      if (user != null) {
+        await user.delete();
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
   //3 second after 3 second check if user verified thi email
   Future<void> checkEmailVerification() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     isEmailvarified = firebaseAuth.currentUser!.emailVerified;
 
     if (!isEmailvarified) {
@@ -69,14 +75,20 @@ class _VerifyEmailState extends State<VerifyEmail> {
       isEmailvarified = firebaseAuth.currentUser!.emailVerified;
     });
     if (isEmailvarified && isreg == true) {
-      timer?.cancel();
+      try {
+        timer?.cancel();
 
-      await firestore
-          .doc()
-          .set({'verified': true, 'email': email, 'password': password});
+        DocumentReference mainDocRef = await firestore
+            .add({'verified': true, 'email': email, 'password': password});
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Home()));
+        //owner id store in shared preference
+        await sharedPreferences.setString('ownerId', mainDocRef.id);
+        //isUserHasAccount store in shared preference
+        await sharedPreferences.setBool('isUserHasAccount', true);
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Home()));
+      } catch (e) {}
     } else if (isEmailvarified && isreg == false) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => ForgetPassword()));
