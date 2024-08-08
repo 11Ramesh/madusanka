@@ -47,7 +47,7 @@ class _SaleState extends State<Sale> {
   }
 
   Future<void> simulateWaiting() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulating a 2-second wait
+    await Future.delayed(Duration(seconds: 2));
     setState(() {
       waiting = false;
     });

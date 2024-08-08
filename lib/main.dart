@@ -6,6 +6,7 @@ import 'package:signup_07_19/bloc/firebase/firebase_bloc.dart';
 import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/login/login.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:signup_07_19/screen/payment/checkpay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: const MaterialApp(
-        home: Login(),
+        home: CheckPayment(),
         debugShowCheckedModeBanner: false,
       ),
     );
