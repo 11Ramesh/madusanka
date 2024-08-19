@@ -7,6 +7,7 @@ import 'package:signup_07_19/const/screenSize.dart';
 import 'package:signup_07_19/screen/login/login.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:signup_07_19/screen/payment/checkpay.dart';
+import 'package:signup_07_19/splashScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,8 +30,8 @@ class MyApp extends StatelessWidget {
           create: (context) => FirebaseBloc(),
         )
       ],
-      child: const MaterialApp(
-        home: CheckPayment(),
+      child: MaterialApp(
+        home: SplashScreen(),
         debugShowCheckedModeBanner: false,
       ),
     );

@@ -70,6 +70,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
   }
 
   Future movetoHome() async {
+    String formattedDate = DateTime.now().toString().split(' ')[0];
     await firebaseAuth.currentUser!.reload();
     setState(() {
       isEmailvarified = firebaseAuth.currentUser!.emailVerified;
@@ -79,7 +80,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
         timer?.cancel();
 
         DocumentReference mainDocRef = await firestore
-            .add({'verified': true, 'email': email, 'password': password});
+            .add({'verified': true, 'email': email, 'password': password,'expdate':formattedDate});
 
         //owner id store in shared preference
         await sharedPreferences.setString('ownerId', mainDocRef.id);

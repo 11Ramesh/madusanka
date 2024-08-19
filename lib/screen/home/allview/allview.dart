@@ -152,6 +152,10 @@ class _SaleState extends State<Sale> {
                     (index) =>
                         state.productAllData[index]['totalPrice'].toString());
 
+                final List<String> midleTitle = List.generate(
+                    state.productAllData.length,
+                    (index) =>
+                        state.productAllData[index]['sellQuantity'].toString());
                 // Spent data
                 final List<String> titleSpent = List.generate(
                     state.spentIds.length,
@@ -204,6 +208,7 @@ class _SaleState extends State<Sale> {
                           // list view for sales data show
                           HomePageListView(
                             title: title,
+                            midleTitle: midleTitle,
                             subtitle: subtitle,
                             leading: Icons.home_work,
                           ),
@@ -231,6 +236,7 @@ class _SaleState extends State<Sale> {
                           HomePageListView(
                             title: titleSpent,
                             subtitle: subtitleSpent,
+                            midleTitle: [''],
                             leading: Icons.attach_money,
                           ),
                           Heights(height: 0.03),

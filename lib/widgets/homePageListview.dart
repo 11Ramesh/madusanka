@@ -5,12 +5,14 @@ class HomePageListView extends StatelessWidget {
   HomePageListView({
     required this.title,
     required this.subtitle,
+    required this.midleTitle,
     required this.leading,
     super.key,
   });
 
   final List<String> title;
   final List<String> subtitle;
+  final List<String> midleTitle;
   final IconData leading;
 
   @override
@@ -30,6 +32,7 @@ class HomePageListView extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
+              TextShow(text: midleTitle[index]),
               TextShow(
                 text: subtitle[index],
                 fontSize: 16,

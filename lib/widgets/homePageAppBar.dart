@@ -9,7 +9,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white70,
+      backgroundColor: Color.fromARGB(109, 255, 255, 255),
       automaticallyImplyLeading: false,
       // leading:  Image.asset(
       //     'assets/images/appbarTitle.png',
@@ -31,7 +31,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 IconButton(
                   icon: const Icon(
-                    Icons.settings,
+                    Icons.power_settings_new_sharp,
+                    fill: BorderSide.strokeAlignCenter,
                     color: Colors.black,
                   ),
                   onPressed: () {
